@@ -1,0 +1,9 @@
+ofxFontStash
+ofxGui
+ofxHTTP
+ofxIO
+ofxJSONRPC
+ofxMediaType
+ofxNetworkUtils
+ofxPoco
+ofxSSLManager
