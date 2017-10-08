@@ -28,6 +28,18 @@ void mirrorType::setup(){
 	
 	
 	mask.load("mask");
+	cout << "SETUP" << endl;
+
+	 lifeSpan=0;
+	timeCounter=0;
+	active=false;
+}
+
+void mirrorType::reset(float timeLimit)
+{
+	active = true;
+	timeCounter = ofGetElapsedTimeMillis();
+	lifeSpan=timeLimit;
 }
 
 //--------------------------------------------------------------
@@ -51,7 +63,7 @@ void mirrorType::draw(vector<ofFbo>cam, ofFbo grad, string text, int size, ofVec
 	ofDrawCircle(ofGetWidth() - 10, ofGetHeight() - 10, 20);
 
 	ofPushMatrix();
-	ofTranslate(pos.x, pos.y + font[0].getBBox(text, size, 0, 0).height);
+	ofTranslate(pos.x, pos.y);// + font[0].getBBox(text, size, 0, 0).height
 	font[i+1].draw(text, size, 0,0);//pos.x,pos.y
 	ofPopMatrix();
 	fboMask[i].end();
@@ -120,7 +132,7 @@ void mirrorType::draw(vector<ofFbo>cam, ofFbo grad, string text, int size, ofVec
 	
 	}
 
-
+	//cout << "d2" << endl;
 	ofSetColor(255, 255, 255);
 	for (int i = 0; i < 4; i++) {
 		//fboDraw[i].begin();
@@ -130,15 +142,23 @@ void mirrorType::draw(vector<ofFbo>cam, ofFbo grad, string text, int size, ofVec
 		fboDraw[i].draw(0, 0);
 	}
 	ofPushMatrix();
-	ofTranslate(pos.x, pos.y+ font[0].getBBox(text, size, 0, 0).height);
+	ofTranslate(pos.x, pos.y);//+ font[0].getBBox(text, size, 0, 0).height
 	//ofVec2f pos(20, ofGetHeight() / 2);
 	ofSetColor(0, 0, 0);
 	font[0].draw(text, size, 0,0);
 	ofNoFill();
 	ofSetColor(255,255,255);
+	if (active) { ofSetColor(255, 0, 0); }
 	ofDrawRectangle(font[0].getBBox(text, size, 0,0));
 	ofPopMatrix();
 	ofFill();
+
+
+	if (ofGetElapsedTimeMillis() - timeCounter > lifeSpan) {
+	
+		active = false;
+
+	}
 
 }
 
@@ -151,3 +171,9 @@ ofRectangle mirrorType::getRect(string text, int size, ofVec2f pos)
 }
 
 //--------------------------------------------------------------
+
+bool mirrorType::isAlive() {
+
+	return active;
+
+}

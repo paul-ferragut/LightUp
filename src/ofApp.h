@@ -6,6 +6,12 @@
 #define GRID_HEIGHT 24
 #define TYPE_MAX 6
 
+struct mType {
+	mirrorType type;
+	string typeString;
+	ofVec2f posType;
+	int sizeType;
+};
 
 class ofApp : public ofBaseApp{
 
@@ -32,14 +38,14 @@ class ofApp : public ofBaseApp{
 		ofVideoGrabber cam;
 		vector<ofRectangle>gridRect;
 		vector<bool>gridRectFilled;
-		mirrorType type[TYPE_MAX];
-		string typeString[TYPE_MAX];
-		ofVec2f posType[TYPE_MAX];
-		int sizeType[TYPE_MAX];
-
-		int currentType;
 
 		vector<int>typeSizeOptions;
+
+
+
+		//int currentType;
+
+	//	vector<int>typeSizeOptions;
 	//	int typeSizeOptions[5] = { 72, 90, 122,180,220};
 
 		void placeType();
@@ -49,4 +55,13 @@ class ofApp : public ofBaseApp{
 
 		vector<ofRectangle>debugRect;
 
+		vector<ofRectangle>debugRect2;
+		mType typeM[TYPE_MAX];
+
+		string typeStringChoice[TYPE_MAX];
+
+		int currentType;
+
+
 };
+

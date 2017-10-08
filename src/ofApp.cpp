@@ -3,14 +3,16 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-	for (int i = 0; i < TYPE_MAX; i++) {
+	//for (int i = 0; i < TYPE_MAX; i++) {
 
-		type[i].setup();
+	//	type[i].setup();
 
-	}
+	//}
 
 	cam.setup(640*2, 480*2);
 
+
+	currentType = 0;
 
 
 	for (int i = 0; i < 4; i++) {	
@@ -38,14 +40,22 @@ void ofApp::setup(){
 	typeSizeOptions.push_back(180);
 	typeSizeOptions.push_back(220);
 
-	typeString[0] = "Lorem ipsum dolor sit amet,";
-	typeString[1] = "consectetur adipiscing";
-	typeString[2] = "Sed porta";
-	typeString[3] = "Morbi";
-	typeString[4] = "vel vulputate ex iaculis";
-	typeString[5] = "Pellentesque vitae quam vehicula, rhoncus risus quis, dignissim ligula";
+	typeStringChoice[0] = "Lorem ipsum dolor sit amet,";
+	typeStringChoice[1] = "consectetur adipiscing";
+	typeStringChoice[2] = "Sed porta";
+	typeStringChoice[3] = "Morbi";
+	typeStringChoice[4] = "vel vulputate ex iaculis";
+	typeStringChoice[5] = "Pellentesque vitae quam vehicula, rhoncus risus quis, dignissim ligula";
 
-	currentType = 0;
+	//currentType = 0;
+
+	for (int i = 0; i < TYPE_MAX; i++) {
+		//cout << "DRAW" << endl;
+		typeM[i].type.setup();
+		//cout << "DRAW" << endl;
+		//type[i]
+
+	}
 
 }
 
@@ -137,6 +147,10 @@ ofNoFill();
 		ofSetColor(190, 40, 40);
 		ofDrawRectangle(debugRect[i]);
 	}
+	for (int i = 0; i < debugRect2.size(); i++) {
+		ofSetColor(190, 255, 40);
+		ofDrawRectangle(debugRect2[i]);
+	}
 	ofFill();
 
 
@@ -149,8 +163,29 @@ ofNoFill();
 
 
 	for (int i = 0; i < TYPE_MAX; i++) {
+		//cout << "DRAW" << endl;
+	
+		//cout << "DRAW" << endl;
+		//type[i]
 
-		type[i].draw(camFBO, camFBO[0], typeString[i], sizeType[i],posType[i]);
+		if(typeM[i].type.isAlive()==false){
+
+			ofRectangle tRect=typeM[i].type.getRect(typeM[i].typeString, typeM[i].sizeType, typeM[i].posType);
+		//	tRect.y += tRect.height;
+			for (int j = 0; j < gridRect.size(); j++) {
+
+
+				if (rectOverlap( gridRect[j], tRect)) {
+					//rect2.inside(gridRect[i].x, gridRect[i].y)|| rect2.inside(gridRect[i].x+ gridRect[i].width, gridRect[i].y), rect2.inside(gridRect[i].x, gridRect[i].y + gridRect[i].height), rect2.inside(gridRect[i].x + gridRect[i].width, gridRect[i].y + gridRect[i].height)) {
+					//cout << "inside" << endl;
+					gridRectFilled[j] = false;
+				}
+			}
+			typeM[i].typeString = "";
+
+		}
+
+	typeM[i].type.draw(camFBO, camFBO[0], typeM[i].typeString, typeM[i].sizeType, typeM[i].posType);
 
 	}
 }
@@ -158,16 +193,25 @@ ofNoFill();
 //--------------------------------------------------------------
 void ofApp::placeType() {
 
+
+	//mType newType;
+
+
+
+	string nTypeString = typeStringChoice[ (int)ofRandom(0, TYPE_MAX) ];
+	
 	int sizeText = typeSizeOptions[ofRandom(0, typeSizeOptions.size())];
-	cout << ofRandom(0, typeSizeOptions.size()) << endl;
-	ofRectangle rect=type[currentType].getRect(typeString[currentType], sizeText, ofVec2f(0, 0));
+	
+	//cout << nTypeString << endl;
+
+	ofRectangle rect= typeM[currentType].type.getRect(nTypeString, sizeText, ofVec2f(0, 0));
 	
 
 
 	if (rect.width > ofGetWidth()) {
 		sizeText = ((sizeText*ofGetWidth()) / rect.width)*0.95;
 		cout << "scaled text, new size:" << sizeText<< endl;
-		rect = type[currentType].getRect(typeString[currentType], sizeText, ofVec2f(0, 0));
+		rect = typeM[currentType].type.getRect(nTypeString, sizeText, ofVec2f(0, 0));
 	}
 
 
@@ -175,13 +219,21 @@ void ofApp::placeType() {
 	bool isFree = false;
 	int counterFindPlace = 0;
 	ofRectangle rect2;
+	ofVec2f posRect;
 	while (isFree == false && counterFindPlace<10) {
 		ofVec2f randomPos(ofRandom(0, ofGetWidth() - rect.width), ofRandom(0, ofGetHeight() - rect.height));
 			counterFindPlace++;
-			rect2.set(randomPos.x, randomPos.y, rect.width, rect.height);
+			cout << randomPos << endl;
+			posRect = randomPos;
+			
+			rect2 = typeM[currentType].type.getRect(nTypeString, sizeText, posRect);//.set(randomPos.x, randomPos.y, rect.width, rect.height);// //
+		//	rect2.y -= rect.height;
+
+			debugRect2.push_back(rect2);
+																					 //rect2.y += rect2.height;																	   //	rect2.y += rect2.height;
 			cout << "new RECT2 attempt:" << rect2 << endl;
 			bool atLeastOne = false;
-			for (int i = 0; i < gridRectFilled.size(); i++) {
+			for (int i = 0; i < gridRect.size(); i++) {
 	
 				if (gridRectFilled[i]) {
 				if (rectOverlap(rect2, gridRect[i]))//(rect2.inside(gridRect[i].x, gridRect[i].y) || rect2.inside(gridRect[i].x + gridRect[i].width, gridRect[i].y), rect2.inside(gridRect[i].x, gridRect[i].y + gridRect[i].height), rect2.inside(gridRect[i].x + gridRect[i].width, gridRect[i].y + gridRect[i].height))
@@ -200,16 +252,30 @@ void ofApp::placeType() {
 				cout << "none were used break" << endl;
 				break;
 			}
+		
 			
-			counterFindPlace++;
+			//counterFindPlace++;
 
 
 	}
 	cout << "afterwhile" << endl;
 	if (isFree) {
+
 		cout << "is free" << rect2 << endl;
-		posType[currentType] = ofVec2f(rect2.x, rect2.y);
-		sizeType[currentType] = sizeText;
+		
+		typeM[currentType].posType = posRect;// ofVec2f(rect2.x, rect2.y);
+		typeM[currentType].sizeType = sizeText;
+		typeM[currentType].typeString = nTypeString;
+		typeM[currentType].type.reset(ofRandom(1000,3000));
+		rect2 = typeM[currentType].type.getRect(typeM[currentType].typeString, typeM[currentType].sizeType, typeM[currentType].posType);
+		currentType++;
+		if (currentType >= TYPE_MAX) {
+			currentType = 0;
+		}
+		//newType.type.setup();
+		//typeM.push_back(newType);
+		//typeM[typeM.size()-1].type.setup();
+		//cout << "push_back" << typeM.size()<< endl;
 
 		debugRect.push_back(rect2);
 
@@ -226,11 +292,11 @@ void ofApp::placeType() {
 	//DELETE A TEXT SPOT
 	//TRY AGAIN
 		cout << "counterFindPlace >= 10" << endl;
-		placeType();
+	//	placeType();
 	}
 
 
-	currentType++;
+
 
 }
 
