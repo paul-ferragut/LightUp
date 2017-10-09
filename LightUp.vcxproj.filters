@@ -1349,6 +1349,9 @@
     <ClInclude Include="src\mirrorType.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\threadedObject.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />

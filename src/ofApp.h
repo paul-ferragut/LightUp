@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "mirrorType.h"
+#include "threadedObject.h"
 
 #define GRID_HEIGHT 24
 #define TYPE_MAX 6
@@ -19,6 +20,9 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+
+		void setupType();
+		void drawType();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -61,6 +65,16 @@ class ofApp : public ofBaseApp{
 		string typeStringChoice[TYPE_MAX];
 
 		int currentType;
+
+
+		ofxFontStash  font[5];
+		ofFbo fboMask[4];
+		ofFbo fboDraw[4];
+		//	string text;
+
+		ofShader mask;
+		ofRectangle rectText;
+
 
 
 };

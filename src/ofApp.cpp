@@ -56,6 +56,7 @@ void ofApp::setup(){
 		//type[i]
 
 	}
+	setupType();
 
 }
 
@@ -170,11 +171,10 @@ ofNoFill();
 
 		if(typeM[i].type.isAlive()==false){
 
-			ofRectangle tRect=typeM[i].type.getRect(typeM[i].typeString, typeM[i].sizeType, typeM[i].posType);
+			ofRectangle tRect= font[0].getBBox(typeM[i].typeString, typeM[i].sizeType, typeM[i].posType.x, typeM[i].posType.y);
+			//typeM[i].type.getRect(typeM[i].typeString, typeM[i].sizeType, typeM[i].posType);
 		//	tRect.y += tRect.height;
 			for (int j = 0; j < gridRect.size(); j++) {
-
-
 				if (rectOverlap( gridRect[j], tRect)) {
 					//rect2.inside(gridRect[i].x, gridRect[i].y)|| rect2.inside(gridRect[i].x+ gridRect[i].width, gridRect[i].y), rect2.inside(gridRect[i].x, gridRect[i].y + gridRect[i].height), rect2.inside(gridRect[i].x + gridRect[i].width, gridRect[i].y + gridRect[i].height)) {
 					//cout << "inside" << endl;
@@ -182,12 +182,11 @@ ofNoFill();
 				}
 			}
 			typeM[i].typeString = "";
-
 		}
-
 	typeM[i].type.draw(camFBO, camFBO[0], typeM[i].typeString, typeM[i].sizeType, typeM[i].posType);
-
 	}
+
+	drawType();
 }
 
 //--------------------------------------------------------------
@@ -204,14 +203,17 @@ void ofApp::placeType() {
 	
 	//cout << nTypeString << endl;
 
-	ofRectangle rect= typeM[currentType].type.getRect(nTypeString, sizeText, ofVec2f(0, 0));
+	ofRectangle rect= font[0].getBBox(nTypeString, sizeText, 0, 0);
+		//typeM[currentType].type.getRect(nTypeString, sizeText, ofVec2f(0, 0));
 	
 
 
 	if (rect.width > ofGetWidth()) {
 		sizeText = ((sizeText*ofGetWidth()) / rect.width)*0.95;
 		cout << "scaled text, new size:" << sizeText<< endl;
-		rect = typeM[currentType].type.getRect(nTypeString, sizeText, ofVec2f(0, 0));
+		rect = font[0].getBBox(nTypeString, sizeText, 0,0);
+
+			//typeM[currentType].type.getRect(nTypeString, sizeText, ofVec2f(0, 0));
 	}
 
 
@@ -226,7 +228,13 @@ void ofApp::placeType() {
 			cout << randomPos << endl;
 			posRect = randomPos;
 			
-			rect2 = typeM[currentType].type.getRect(nTypeString, sizeText, posRect);//.set(randomPos.x, randomPos.y, rect.width, rect.height);// //
+			rect2 = font[0].getBBox(nTypeString, sizeText, posRect.x, posRect.y);
+
+				
+				
+				//typeM[currentType].type.getRect(nTypeString, sizeText, posRect);//.set(randomPos.x, randomPos.y, rect.width, rect.height);// //
+
+
 		//	rect2.y -= rect.height;
 
 			debugRect2.push_back(rect2);
@@ -252,10 +260,8 @@ void ofApp::placeType() {
 				cout << "none were used break" << endl;
 				break;
 			}
-		
-			
-			//counterFindPlace++;
 
+			//counterFindPlace++;
 
 	}
 	cout << "afterwhile" << endl;
@@ -267,7 +273,9 @@ void ofApp::placeType() {
 		typeM[currentType].sizeType = sizeText;
 		typeM[currentType].typeString = nTypeString;
 		typeM[currentType].type.reset(ofRandom(1000,3000));
-		rect2 = typeM[currentType].type.getRect(typeM[currentType].typeString, typeM[currentType].sizeType, typeM[currentType].posType);
+		rect2 = font[0].getBBox(typeM[currentType].typeString, typeM[currentType].sizeType, typeM[currentType].posType.x, typeM[currentType].posType.y);
+			
+			//typeM[currentType].type.getRect(typeM[currentType].typeString, typeM[currentType].sizeType, typeM[currentType].posType);
 		currentType++;
 		if (currentType >= TYPE_MAX) {
 			currentType = 0;
@@ -368,5 +376,167 @@ void ofApp::gotMessage(ofMessage msg){
 
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
+
+}
+
+
+//--------------------------------------------------------------
+void ofApp::setupType() {
+
+	for (int i = 0; i < 4; i++) {
+
+		fboMask[i].allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+		fboDraw[i].allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+
+	}
+
+	int fontSize = 72;
+
+	font[0].setup("fonts/Detroit11BevelOne.ttf", 1.0, 1024, false, 8, 1.5);//Vera.ttf
+
+	font[1].setup("fonts/Detroit06PrismLeft.ttf", 1.0, 1024, false, 8, 1.5);
+
+	font[2].setup("fonts/Detroit07PrismRight.ttf", 1.0, 1024, false, 8, 1.5);
+
+	font[3].setup("fonts/Detroit08PrismTop.ttf", 1.0, 1024, false, 8, 1.5);
+
+	font[4].setup("fonts/Detroit09PrismBottom.ttf", 1.0, 1024, false, 8, 1.5);
+
+	for (int i = 0; i < 5; i++) {
+		font[i].setCharacterSpacing(0);
+	}
+
+
+	mask.load("mask");
+	cout << "SETUP" << endl;
+}
+
+//--------------------------------------------------------------
+void ofApp::drawType() {
+
+
+	for (int k = 0; k < TYPE_MAX ; k++) {
+
+
+
+
+
+
+
+
+
+	for (int i = 0; i < 4; i++) {
+
+
+
+		fboMask[i].begin();
+		//ofScale(0.5, 0.5);
+		ofClear(0, 0, 0, 255);
+		//ofBackgroundGradient(ofColor(0, 0, 0), ofColor(0, 0, 0), OF_GRADIENT_LINEAR);	
+		ofSetColor(255, 255, 255);
+		ofNoFill();
+		ofDrawRectangle(10, 10, ofGetWidth() - 20, ofGetHeight() - 20);
+		ofFill();
+		ofDrawCircle(10, 10, 20);
+		ofDrawCircle(10, ofGetHeight() - 10, 20);
+		ofDrawCircle(ofGetWidth() - 10, ofGetHeight() - 10, 20);
+
+		ofPushMatrix();
+		ofTranslate(typeM[k].posType);// + font[0].getBBox(text, size, 0, 0).height
+		font[i + 1].draw(typeM[k].typeString, typeM[k].sizeType, 0, 0);//pos.x,pos.y
+		ofPopMatrix();
+		fboMask[i].end();
+
+
+
+		fboDraw[i].begin();
+		ofClear(0, 0);
+		//ofClearAlpha();
+		ofSetColor(255, 255, 255);
+
+		/*
+
+		*/
+		/*
+		ofFbo camFBO;
+		camFBO.allocate(ofGetWidth(), ofGetHeight());
+
+		camFBO.begin();
+
+		ofPushMatrix();
+		switch (i) {
+
+		case 0:
+		ofScale(1, 1);
+		break;
+		case 1:
+		ofScale(-1,1);
+		ofTranslate(-ofGetWidth(), 0);
+		break;
+		case 2:
+		ofScale(-1, -1);
+		ofTranslate(-ofGetWidth(), -ofGetHeight());
+		break;
+		case 3:
+		ofScale(1, -1);
+		ofTranslate(0, -ofGetHeight());
+		break;
+		}
+		cam.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+		ofPopMatrix();
+
+		camFBO.end();
+
+		*/
+
+		mask.begin();
+		mask.setUniformTexture("maskTex", fboMask[i].getTexture(), 1);
+		ofFill();
+		//ofSetColor(255, 0, 0);
+		//ofDrawRectangle(10, 10, ofGetWidth() - 10, ofGetHeight() - 10);
+		//	ofPushMatrix();
+		//ofPopMatrix();
+
+		//	ofScale(2, 2);
+
+
+		camFBO[i].draw(0, 0);
+
+		mask.end();
+		fboDraw[i].end();
+
+		//fboDraw[i].getTexture().setAlphaMask(fboMask[i].getTexture());
+
+
+	}
+
+	//cout << "d2" << endl;
+	ofSetColor(255, 255, 255);
+	for (int i = 0; i < 4; i++) {
+		//fboDraw[i].begin();
+
+		//fboDraw[i].end();
+
+		fboDraw[i].draw(0, 0);
+	}
+	ofPushMatrix();
+	ofTranslate(typeM[k].posType);//+ font[0].getBBox(text, size, 0, 0).height
+							  //ofVec2f pos(20, ofGetHeight() / 2);
+	ofSetColor(0, 0, 0);
+	font[0].draw(typeM[k].typeString, typeM[k].sizeType, 0, 0);
+	ofNoFill();
+	ofSetColor(255, 255, 255);
+	///if (active) { ofSetColor(255, 0, 0); }
+	ofDrawRectangle(font[0].getBBox(typeM[k].typeString, typeM[k].sizeType, 0, 0));
+	ofPopMatrix();
+	ofFill();
+
+
+
+
+
+
+}
 
 }
