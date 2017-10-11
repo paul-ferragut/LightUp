@@ -1,3 +1,4 @@
+ofxColorGradient
 ofxFontStash
 ofxGui
 ofxHTTP

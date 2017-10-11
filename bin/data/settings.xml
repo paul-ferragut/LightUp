@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<GUI>
+	<duration_text>88.125</duration_text>
+	<duration_stayBright>56.93</duration_stayBright>
+	<sentiment_Increase_Ratio>0.5</sentiment_Increase_Ratio>
+	<debug>0</debug>
+	<duration_color_transitions>6807.5</duration_color_transitions>
+	<sentiment_Increment>104.253</sentiment_Increment>
+	<sentiment_Decrement>0.53395</sentiment_Decrement>
+	<use_cam_reflection>1</use_cam_reflection>
+	<bgDebug>0</bgDebug>
+</GUI>
