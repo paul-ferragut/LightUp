@@ -9,4 +9,5 @@
 	<sentiment_Decrement>0.53395</sentiment_Decrement>
 	<use_cam_reflection>1</use_cam_reflection>
 	<bgDebug>0</bgDebug>
+	<rateComLed>10</rateComLed>
 </GUI>

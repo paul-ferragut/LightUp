@@ -78,7 +78,6 @@ class ofApp : public ofBaseApp{
 	
 		mType typeM[TYPE_MAX];
 
-		string typeStringChoice[TYPE_MAX];
 
 		int currentType;
 
@@ -163,6 +162,36 @@ class ofApp : public ofBaseApp{
 
 		ofColor typoColor[4];
 		ofColor ledColor[2];
+
+
+
+		ofxIntSlider rateComLed;
+		ofSerial serial;
+
+		bool censorCheck(string inputS);
+
+		vector<string> swear = { "anal", "anus", "arse", "ass",  "asses", "assfucker", "assfukka", "asshole", "assholes", "asswhole", "ballbag", "balls",  "bastard", 
+			"beastiality", "bellend", "bestial", "bestiality", "biatch", "bitch", "bitcher", "bitchers", "bitches", "bitchin", "bitching", "bloody", "blowjob", "blowjobs",
+			 "bollock",  "boner", "boob", "boobs",  "breasts",  "bum", "butt", "butthole", "buttmuch", "buttplug", "clit", "clitoris", "clits", "cnut", "cock", "cockface", 
+			"cockhead", "cocks","cocksucked", "cocksucker", "cocksucking", "cocksucks", "crap", "cum",  "cumming", "cums", "cumshot", "cunilingus", "cunillingus", "cunnilingus",
+			"cunt", "cuntlick", "cuntlicker", "cuntlicking", "cunts","cyberfuck", "cyberfucked", "cyberfucker", "cyberfuckers", "cyberfucking", "damn", "dick", "dickhead", 
+			"dildo", "dildos", "ejaculate", "ejaculated", "ejaculates", "ejaculating", "ejaculatings", "ejaculation", "fag",  "faggot", "faggs", "fagot", "fagots", "fags",
+			"fanny", "fannyflaps", "fannyfucker", "fatass", "fellate", "fingerfuck", 
+			"fingerfucked", "fingerfucker", "fingerfuckers", "fingerfucking", "fingerfucks", "fistfuck", "fistfucked", "fistfucker", "fistfuckers", "fistfucking",
+			"fistfuckings", "fistfucks", "flange",  "fuck", "fucka", "fucked", "fucker", "fuckers", "fuckhead", "fuckheads", "fuckin", "fucking", "fuckings", 
+			"fuckme", "fucks", "fuckwhit", "fuckwit", "gangbang", "gangbanged", "gangbangs", "gaylord", "homo", "horniest", "horny", "jerk-off", "jism", 
+			"jizz", "knob", "knobead", "knobed", "knobend", "knobhead", "knobjocky", "knobjokey",  "labia", "lust", "lusting",
+			"masochist", "masturbate", "mo-fo", "mof0", "mofo", "mothafuck", "mothafucka", "mothafuckas", "mothafuckaz", "mothafucked", "mothafucker", "mothafuckers",
+			"mothafuckin", "mothafucking", "mothafuckings", "mothafucks", "mother fucker", "motherfuck", "motherfucked", "motherfucker", "motherfuckers", "motherfuckin",
+			"motherfucking", "motherfuckings", "motherfuckka", "motherfucks", "muff",
+			"nazi",  "nigga", "niggah", "niggas", "niggaz", "nigger", "niggers", "nob", "nob jokey", "nobhead", "nobjocky", "nobjokey", "numbnuts", "nutsack", "orgasim", 
+			"orgasims", "orgasm", "orgasms","pawn", "pecker", "penis", "piss", "pissed", "pisser", "pissers", "pisses", "pissflaps", "pissin", "pissing", "pissoff",  
+			"porn", "porno", "pornography", "pornos", "prick", "pricks", "pube", "pusse",  "pussies", "pussy", "pussys", "rectum", 
+			"sadist", "schlong", "screwing",  "scrotum", "semen", "sex", "shag", "shagger", "shaggin", "shagging", "shemale", "shi+", "shit", "shitdick", "shite", 
+			"shited", "shitey", "shitfuck", "shitfull", "shithead", "shiting", "shitings", "shits", "shitted", "shitter", "shitters", "shitting", "shittings",
+			"shitty", "skank", "slut", "sluts", "smut","spunk",  "testical", "testicle", "tit", "titfuck", "tits", "tittiefucker", "titties", "tittyfuck", 
+			"tittywank", "titwank", "tosser", "turd", "twat", "vagina", "viagra", "vulva", "wang", "wank", "wanker", "wanky", "whore",
+			"willies", "willy", "xrated" };
 
 private:
 	// A custom logging channel to mirror all log messages to the web clients.

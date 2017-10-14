@@ -24,6 +24,7 @@ void ofApp::setup(){
 	gui.add(debug.setup("debug", false));
 	gui.add(useCam.setup("use cam reflection", false));
 	gui.add(bgDebug.setup("bgDebug", false));
+	gui.add(rateComLed.setup("rateComLed", 10, 1, 40));
 
 
 	gui.loadFromFile("settings.xml");
@@ -58,13 +59,6 @@ void ofApp::setup(){
 	typeSizeOptions.push_back(120);
 	typeSizeOptions.push_back(180);
 	typeSizeOptions.push_back(220);
-
-	typeStringChoice[0] = "Lorem ipsum dolor sit amet,";
-	typeStringChoice[1] = "consectetur adipiscing";
-	typeStringChoice[2] = "Sed porta";
-	typeStringChoice[3] = "Morbi";
-	typeStringChoice[4] = "vel vulputate ex iaculis";
-	typeStringChoice[5] = "Pellentesque vitae quam vehicula, rhoncus risus quis, dignissim ligula";
 
 	//currentType = 0;
 
@@ -156,6 +150,21 @@ void ofApp::setup(){
 
 
 
+
+	serial.listDevices();
+	vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
+
+	// this should be set to whatever com port your serial device is connected to.
+	// (ie, COM4 on a pc, /dev/tty.... on linux, /dev/tty... on a mac)
+	// arduino users check in arduino app....
+	int baud = 115200;
+	string com = "COM8";
+	serial.setup(com, baud); //open the first device
+							 //serial.setup("COM4", baud); // windows example
+							 //serial.setup("/dev/tty.usbserial-A4001JEC", baud); // mac osx example
+
+
+
 }
 
 //--------------------------------------------------------------
@@ -243,10 +252,14 @@ void ofApp::update() {
 
 			if (prevWords.size() == newWords.size() && prevWords.size() > 0){
 				cout << "REPLACED WORD: " << newWords[newWords.size() - 1] << "  .prev word: "<< prevWords[prevWords.size() - 1]<<endl;
+				bool swearW= censorCheck(newWords[newWords.size() - 1]);
+				if(swearW==false)
 				typeM[currentType].typeString = newWords[newWords.size() -1];
 			}
 			else if(newWords.size()>prevWords.size()){
 				cout << "NEW WORD" << newWords[newWords.size()-1] << endl;
+				bool swearW = censorCheck(newWords[newWords.size() - 1]);
+				if (swearW == false)
 				placeType(newWords[newWords.size()-1],ofRandom(1.0,1.5));
 			}
 		}
@@ -318,6 +331,54 @@ void ofApp::updateCol() {
 		typoColor[3] = currentColor[5];
 		typoColor[3].setBrightness(mappedBrightnessTypo-50);
 
+
+
+
+
+		ofColor tCol1 = ledColor[0];
+		ofColor tCol2 = ledColor[1];
+		//cout << ofToString((int)tCol1.r) << endl;
+
+		string colS[6];
+		colS[0] = ofToString((int)tCol1.r);
+		colS[1] = ofToString((int)tCol1.g);
+		colS[2] = ofToString((int)tCol1.b);
+		colS[3] = ofToString((int)tCol2.r);
+		colS[4] = ofToString((int)tCol2.g);
+		colS[5] = ofToString((int)tCol2.b);
+
+		for (int i = 0; i < 6; i++) {
+			int sizeS = colS[i].size();
+			if (sizeS == 1) {
+				colS[i] = "00" + colS[i];
+			}
+			if (sizeS == 2) {
+				colS[i] = "0" + colS[i];
+			}
+		}
+
+
+		string colString = "0:" + colS[0] + "&1:" + colS[1] + "&2:" + colS[2] + "&3:" + colS[3] + "&4:" + colS[4] + "&5:" + colS[5];//+"\n"
+
+																																	//string colString = ofToString((int)tCol1.r) + "," + ofToString((int)tCol1.g) + "," + ofToString((int)tCol1.b) + "," + ofToString((int)tCol2.r) + "," + ofToString((int)tCol2.g) + "," + ofToString((int)tCol2.b);
+
+
+		if (serial.available() == 0 && (ofGetFrameNum() % rateComLed == 0))//&& ofGetFrameNum() % 100
+		{
+			//cout << "sending message: " << ofGetFrameNum() << "\n";
+		//	cout << colString.size() << endl;
+		//	cout << colString << endl;
+			//serial.writeString(colString);
+
+			//string msg = "some serial message";
+			unsigned char* msguc = new unsigned char[colString.size()];
+			memcpy(msguc, colString.c_str(), colString.size());
+			serial.writeBytes(msguc, colString.size());
+			delete[] msguc;
+
+			//serial.writeBytes()
+			//message = "";
+		}
 
 }
 
@@ -621,6 +682,7 @@ bool ofApp::rectOverlap(ofRectangle A, ofRectangle B)
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	//placeType();
+
 }
 
 //--------------------------------------------------------------
@@ -814,11 +876,19 @@ void ofApp::drawType() {
 }
 
 void ofApp::ping()
-{	if (userText.size() > 1) {
+{	
 	
+	
+	
+
+	if (userText.size() > 1) {
+	
+
 	pingPlayer.play();
 	ofLogVerbose("ofApp::ping") << "Ping'd";
 	//	sendToThread = true;
+
+
 
 
 	//cout << thread.exec("gcloud ml language analyze-sentiment --content=\"suck my dick\"") << endl;
@@ -836,6 +906,10 @@ void ofApp::ping()
 	//thread.unlock();
 	//cout << "ping" << endl;
 
+	
+	bool swearW = censorCheck(userText);
+
+	if (swearW ==false) {
 		placeType(userText);
 
 	string inputChar = "gcloud ml language analyze-sentiment --content=\"" + userText + "\"";
@@ -861,7 +935,10 @@ void ofApp::ping()
 			}
 		}
 	}
-
+	}
+	else {
+		currentLight = 0;
+	}
 
 	}
 	//cout << "end ping" << endl;
@@ -927,3 +1004,27 @@ void ofApp::setUserTextSpeech(const std::string& text)
 	userText = text;
 }
 
+
+bool ofApp::censorCheck(string inputS) {
+	vector<string>splitS = ofSplitString(inputS, " ", true, true);
+	bool swearWord = false;
+	for (int i = 0; i < swear.size(); i++) {
+		for (int j = 0; j < splitS.size(); j++) {
+			//cout << splitS[j] << " ::" << swear[i] << endl;
+			if (splitS[j] == swear[i]) {
+				swearWord = true;
+				cout << "swear" << swear[i] << endl;
+			}
+		}
+	}
+
+
+	for (int j = 0; j < splitS.size(); j++) {
+		if (splitS[j].find("*") != std::string::npos) {
+			cout << "found *" << endl;
+			swearWord = true;
+		}
+	}
+
+	return swearWord;
+}
