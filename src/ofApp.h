@@ -211,3 +211,97 @@ private:
 	mutable std::mutex mutex;
 };
 
+
+/*
+
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>
+#endif
+
+#define PIN1 6
+#define PIN2 7
+
+#define INPUT_SIZE 35
+
+Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(420, PIN1, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip2 = Adafruit_NeoPixel(120, PIN2, NEO_GRB + NEO_KHZ800);
+
+int col[6];
+
+void setup() {
+
+
+Serial.begin(115200);        // connect to the serial port
+
+
+
+strip1.begin();
+strip1.show(); // Initialize all pixels to 'off'
+
+strip2.begin();
+strip2.show(); // Initialize all pixels to 'off'
+
+
+for(int i=0;i<6;i++){
+col[i]=0;
+}
+}
+
+void loop () {
+// read the serial port
+
+if (Serial.available()==INPUT_SIZE) {
+// Get next command from Serial (add 1 for final 0)
+char input[INPUT_SIZE + 1];
+byte size = Serial.readBytes(input, INPUT_SIZE);
+// Add the final 0 to end the C string
+input[size] = 0;
+
+// Read each command pair
+char* command = strtok(input, "&");
+while (command != 0)
+{
+// Split the command in two values
+char* separator = strchr(command, ':');
+if (separator != 0)
+{
+// Actually split the string in 2: replace ':' with 0
+*separator = 0;
+int iD = atoi(command);
+++separator;
+int position = atoi(separator);
+
+// Do something with servoId and position
+col[iD]=position;
+}
+// Find the next command in input string
+command = strtok(0, "&");
+}
+
+}else{
+serialFlush();
+}
+
+for (uint16_t i=0; i < strip1.numPixels(); i++) {
+strip1.setPixelColor(i, strip1.Color(col[0],col[1],col[2]));        //turn every third pixel off
+}
+
+for (uint16_t i=0; i < strip2.numPixels(); i++) {
+strip2.setPixelColor(i, strip2.Color(col[3],col[4],col[5]));        //turn every third pixel off
+}
+
+strip1.show();
+strip2.show();
+delay(20);
+}
+
+
+
+void serialFlush(){
+while(Serial.available() > 0) {
+char t = Serial.read();
+}
+}
+
+*/
